@@ -3,8 +3,8 @@ import numpy as np
 
 def pdist_torch(emb1, emb2):
     '''
-    compute the eucilidean distance matrix between embeddings1 and embeddings2
-    using gpu
+    Takes two embedding tensors (nxd) and (mxd),
+    Returns the (nxm) pairwise euclidean distance matrix using gpu - GitHub repo: CoinCheung/triplet-reid-pytorch.
     '''
     m, n = emb1.shape[0], emb2.shape[0]
     emb1_pow = torch.pow(emb1, 2).sum(dim = 1, keepdim = True).expand(m, n)
@@ -16,6 +16,10 @@ def pdist_torch(emb1, emb2):
 
 
 def pick_random(loader):
+    """
+    Splits the validation/test sets according to the evaluation protocol provided with VehicleID dataset.
+    Returns the gallery set indices.
+    """
     indices = torch.arange(0, len(loader.dataset.imgs))
     labels = torch.LongTensor(loader.dataset.targets)
     images_sel = torch.zeros(len(torch.unique(labels)), dtype=torch.int)
@@ -25,13 +29,21 @@ def pick_random(loader):
     return(images_sel)
 
 def rank_k(distances, k):
+    """
+    Takes the query-gallery distance matrix and the k referring to rank-k accuracy.
+    Returns the top-k predictions for each query.
+    """
     predictions = torch.ones(k, distances.shape[1], dtype=torch.int)
-    for column in range(distances.shape[1]):
-        predictions[:,column] = distances[:,column].topk(k, sorted = True, largest=False)[1]
+    for query in range(distances.shape[1]):
+        predictions[:,query] = distances[:,query].topk(k, sorted = True, largest=False)[1]
     return(predictions)
 
 
 def belongs(min_k_distances, true_labels):
+    """
+    Takes the top-k predictions and the true labels.
+    Returns boolean value determining whether each query's true label belongs or not in the top-k predictions.
+    """
     correct_k = 0
     for probe in range(len(true_labels)):
         if true_labels[probe].item() in min_k_distances[:,probe]:
@@ -40,6 +52,10 @@ def belongs(min_k_distances, true_labels):
 
 
 def compute_rank(features, labels, test_loader, device, replications=5):
+    """
+    Takes features and labels tensors, a dataloader object, the device to perform operations on, and the number of replications.
+    Returns rank-1 and rank-5 accuracy averaged over replications.
+    """
 
     rank_1_replicates, rank_5_replicates = ([], [])
     
@@ -48,18 +64,18 @@ def compute_rank(features, labels, test_loader, device, replications=5):
 
             torch.manual_seed(1992)
             gallery = pick_random(test_loader)
-            probe = torch.from_numpy( np.setdiff1d(torch.arange(len(test_loader.dataset)), gallery)).long().to(device)
+            probe = torch.from_numpy(np.setdiff1d(torch.arange(len(test_loader.dataset)), gallery)).long().to(device)
             gallery_feats = features[gallery.long()].to(device)
-            probe_feats, probe_targets = features[probe].to(device), labels[probe].to(device)
-            distances = pdist_torch(gallery_feats, probe_feats)
+            query_feats, query_targets = features[probe].to(device), labels[probe].to(device)
+            distances = pdist_torch(gallery_feats, query_feats)
             
             correct1, correct5 = (0,0)
-            correct1 +=  probe_targets.eq(torch.argmin(distances, dim=0).float()).sum().item()
-            correct5 += belongs(rank_k(distances, 5), probe_targets)
+            correct1 +=  query_targets.eq(torch.argmin(distances, dim=0).float()).sum().item()
+            correct5 += belongs(rank_k(distances, 5), query_targets)
     
-            rank_1, rank_5 = (correct1 / probe_targets.size()[0], correct5 / probe_targets.size()[0])
+            rank_1, rank_5 = (correct1 / query_targets.size(0), correct5 / query_targets.size(0))
             rank_1_replicates.append(rank_1)
             rank_5_replicates.append(rank_5)
         
-    return(sum(rank_1_replicates)/replications, sum(rank_5_replicates)/replications )
+    return(sum(rank_1_replicates)/replications, sum(rank_5_replicates)/replications)
 

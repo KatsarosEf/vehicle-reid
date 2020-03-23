@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import os
 from sampler import BalancedBatchSampler as BatchSampler
 from evaluation import compute_rank
-from utils import BatchTripletSelector
+from utils import BatchAll
 import copy
 from torch.utils.tensorboard import SummaryWriter
 
@@ -17,7 +17,13 @@ print("PyTorch Version: ",torch.__version__)
 print("Torchvision Version: ",torchvision.__version__)
 
 def dataset(data_dir, input_size = 224):
-    "Initializes dataset dictionaries."    
+    """ 
+    Loads the transformations required for ImageNet-pretrained models and initializes training and validation datasets.
+    Args:
+        data_dir (string): Data directory. Each folder within the directory stands for a vehicle ID (class).
+    Returns:
+        A dictionary of two keys ('train', 'val') accommodating the datasets.
+    """    
     data_transforms = {
         'train': transforms.Compose([
             transforms.Resize(input_size),
@@ -34,17 +40,38 @@ def dataset(data_dir, input_size = 224):
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'val']}
     return(image_datasets)
 
-def dataloader(image_datasets, batch_size, num_workers):  
-    "Initializes dataloaders."  
+def dataloader(image_datasets, val_batch_size):  
+    """ 
+    Loads the dataloaders to iterate on for each of the training and validation datasets.
+    Args:
+        image_datasets (dictionary): Dictionary accomodating the two datasets (objects).
+        batch_size (integer): Number of images to yield per batch for the validation set.
+    Returns:
+        A dictionary of two keys ('train', 'val') accommodating the dataloaders.
+    """    
     dataloaders = {}
-    train_sampler = BatchSampler(image_datasets['train'], 6, 5)
-    dataloaders['train']  = torch.utils.data.DataLoader(image_datasets['train'], batch_sampler = train_sampler, num_workers = num_workers)
-    dataloaders['val'] =  torch.utils.data.DataLoader(image_datasets['val'], batch_size = batch_size, num_workers = num_workers)
+    train_sampler = BatchSampler(image_datasets['train'], 3, 3)
+    dataloaders['train']  = torch.utils.data.DataLoader(image_datasets['train'], batch_sampler = train_sampler, num_workers = 4)
+    dataloaders['val'] =  torch.utils.data.DataLoader(image_datasets['val'], batch_size = val_batch_size, num_workers = 4)
     return(dataloaders)
 
 
 def train_model(model, dataloaders, criterion, optimizer, nr_epochs, scheduler, string_name, device):
-    "Model training for 'nr_epochs' epochs."
+    """ 
+    Performs model training for a set number of epochs.
+    Args:
+        model (nn.Module): Instance of a pytorch model.
+        dataloaders (dictionary): A dictionary of the two keys accommodating the dataloaders.
+        criterion:
+        optimizer:
+        nr_epochs:
+        scheduler:
+        string_name (string): Name of the experiment performed.
+        device: 
+        
+    Returns:
+        The trained model.
+    """    
     logger = SummaryWriter()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_rank1_v, best_rank5_v = 0.0, 0.0
@@ -81,8 +108,8 @@ def train_model(model, dataloaders, criterion, optimizer, nr_epochs, scheduler, 
                         labels_val[index*dataloaders[phase].batch_size:dataloaders[phase].batch_size*(index+1)] = labels
             # for each epoch
             if phase == 'train':
-                epoch_TL = running_loss/ nr_batch_triplets                
-                print('{} Triplet Loss: {:.4f} Informative triplets: {:.4f}'.format(phase, epoch_TL, round(nr_batch_triplets/len(dataloaders[phase]))))
+                epoch_loss = running_loss/ nr_batch_triplets                
+                print('{} Triplet Loss: {:.4f} Informative triplets: {:.4f}'.format(phase, epoch_loss, round(nr_batch_triplets/len(dataloaders[phase]))))
             else:
                 rank1_v, rank5_v = compute_rank(feats_val, labels_val, dataloaders[phase], device)
                 print('{} Rank-1: {:.4f} Rank-5: {:.4f}'.format(phase, rank1_v, rank5_v))
@@ -93,7 +120,7 @@ def train_model(model, dataloaders, criterion, optimizer, nr_epochs, scheduler, 
                 best_model_wts = copy.deepcopy(model.state_dict())
                 torch.save(model.state_dict(), string_name + '.pt')
         
-        logger.add_scalars(string_name, {'train_loss':running_loss/nr_batch_triplets,
+        logger.add_scalars(string_name, {'train_loss':epoch_loss,
                                          'nr_triplets':nr_batch_triplets,
                                          'rank1_val': rank1_v,
                                          'rank5_val': rank5_v}, epoch+1)
@@ -113,7 +140,7 @@ def main(string_name, nr_epochs):
     print("Dataset is loaded.")
     
     print("\nInitializing dataloaders...")
-    dataloaders = dataloader(image_datasets, batch_size = 8, num_workers = 4)
+    dataloaders = dataloader(image_datasets, val_batch_size = 6)
     print("Dataloaders are booted.")
 
     print("\nInitializing model...")
@@ -132,5 +159,5 @@ def main(string_name, nr_epochs):
     
 
 if __name__ == '__main__':
-    triplet_selector = BatchTripletSelector(0.3)
+    triplet_selector = BatchAll(0.3)
     main(string_name = 'triplet_batchall', nr_epochs = 30)

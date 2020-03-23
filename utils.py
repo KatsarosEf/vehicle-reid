@@ -3,15 +3,46 @@ import numpy as np
 import torch
 
 
+def get_lr(optimizer):
+    """
+    Returns the learning rate related to the optimizer status.
+    """
+    for param_group in optimizer.param_groups:
+        return param_group['lr']
+
+def create_logs(string_name):
+    """
+    Initialize logger text file.
+    """
+    with open(string_name + '.txt', 'w') as file:
+        file.write("")
+        file.close()
+        
+def update_logs(string_name, phase, epoch, num_epochs, optimizer, train_history, val_history):
+    """
+    Update logger text file.
+    """
+    f = open(string_name + ".txt", "a")
+    if phase == 'train':
+        f.write('Epoch {}/{}'.format(epoch+1, num_epochs ) + ' -' * 20 + ' \n')
+        f.write('Learning rate for this epoch was ' + str(get_lr(optimizer))  + ' \n')
+        f.write('Train Triplet loss: ' + str(train_history[epoch][0]) + 'Informative triplets: ' + str(train_history[epoch][1]))
+    else:
+        f.write('Val Rank-1 Accuracy: '+ str(val_history[epoch][0]) + ', Rank-5 Accuracy:' + str(val_history[epoch][1]) + ' \n' )
+        f.close()
+
+
 def pdist(vectors):
-    "Computes euclidian pairwise distances of n data points(embeddings)."
+    """
+    Computes euclidian pairwise distances of n data points(embeddings).
+    Args:
+        vectors (torch.tensor): A (nxd) embeddings tensor.
+    Returns:
+        An L2 pairwise (nxn) distance matrix.
+    """
     distance_matrix = -2 * vectors.mm(torch.t(vectors)) + vectors.pow(2).sum(dim=1).view(1, -1) + vectors.pow(2).sum(
         dim=1).view(-1, 1)
     return distance_matrix
-
-def random_hard_negative(loss_values):
-    hard_negatives = np.where(loss_values > 0)[0]
-    return hard_negatives if len(hard_negatives) > 0 else None
 
 class BatchAll:
     """
@@ -45,39 +76,16 @@ class BatchAll:
                     hard_negative = negative_indices[hard_negative]
                     trips_to_add = np.hstack(( np.tile(anchor_positive[0:2], (len(hard_negative), 1)), hard_negative.reshape(len(hard_negative), 1) )).tolist()
                     triplets.extend(trips_to_add)
+        if len(triplets) == 0:
+            triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
 
-#        if len(triplets) == 0:
-#            triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
 
         return torch.LongTensor(triplets)
 
-
-def BatchTripletSelector(margin):
-    "Wrapper."
-    return BatchAll(margin=margin)
-
-def get_lr(optimizer):
-    "Returns the learning rate related to the optimizer status."
-    for param_group in optimizer.param_groups:
-        return param_group['lr']
-
-def create_logs(string_name):
-    "Initialize logger."
-    with open(string_name + '.txt', 'w') as file:
-        file.write("")
-        file.close()
-
-        
-def update_logs(string_name, phase, epoch, num_epochs, optimizer, train_history, val_history):
-    "Update logger."
-    f = open(string_name + ".txt", "a")
-    if phase == 'train':
-        f.write('Epoch {}/{}'.format(epoch+1, num_epochs ) + ' -' * 20 + ' \n')
-        f.write('Learning rate for this epoch was ' + str(get_lr(optimizer))  + ' \n')
-        f.write('Train Triplet loss: ' + str(train_history[epoch][0]) + 'Informative triplets: ' + str(train_history[epoch][1]))
-    else:
-        f.write('Val Rank-1 Accuracy: '+ str(val_history[epoch][0]) + ', Rank-5 Accuracy:' + str(val_history[epoch][1]) + ' \n' )
-        f.close()
-
-
-
+    def pdist(self, vectors):
+        """
+        Computes euclidian pairwise distances of n data points(embeddings).
+        """
+        distance_matrix = -2 * vectors.mm(torch.t(vectors)) + vectors.pow(2).sum(dim=1).view(1, -1) + vectors.pow(2).sum(
+            dim=1).view(-1, 1)
+        return distance_matrix
