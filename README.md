@@ -28,6 +28,11 @@ Assumes a directory where images are split into train and val. Each vehicle's im
 It is used to train the viewpoint classification model. Requires the trained coarse model to evaluate triplet embeddings before inputting them for classification. The viewpoint classifier takes an input image and determines whether it is the frontal or backside vehicle viewpoint.<br /> 
 Assumes a directory where images are split into train, val and optionally test sets:
 
+<div align="right">
+
+# This is gonna be right-aligned!
+</div>
+
 ###### viewpoints\train\img_1<br /> 
 ######                \img_2<br /> 
 ######                 .....<br /> 
