@@ -1,6 +1,0 @@
-Weights of models discussed in the paper as dictionaries.
-Downloadable here: https://1drv.ms/u/s!AoEekc0Cw3zhgbA0o3HSjFyaKJSg4Q?e=Oa6gik
--- coarse_model.pt 
--- fine_model.pt 
--- viewpoint_classifier.pt
--- detector.pt
