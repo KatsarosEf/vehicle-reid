@@ -2,6 +2,13 @@
 
 Github repo for the paper "A Triplet-learnt Coarse-to-Fine Reranking for Vehicle Re-identification".
 
+Weights of models discussed in the paper as dictionaries.
+Downloadable here: https://1drv.ms/u/s!AoEekc0Cw3zhgbA0o3HSjFyaKJSg4Q?e=Oa6gik
+-- coarse_model.pt 
+-- fine_model.pt 
+-- viewpoint_classifier.pt
+-- detector.pt
+
 -- train_coarse.py is used to train the coarse densenet121 model utilizing the triplet loss and BatchAll sampling technique. The coarse triplet model projects similar vehicle images closer together and disimilar ones further apart.
 Assumes a directory where images are split into train and val. Each vehicle's images are then found on unique identity folders:
 
