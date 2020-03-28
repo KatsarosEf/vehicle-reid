@@ -2,7 +2,7 @@
 
 Github repo for the paper "A Triplet-learnt Coarse-to-Fine Reranking for Vehicle Re-identification".
 
-Weights of models discussed in the paper as dictionaries.
+Weights of models discussed in the paper as dictionaries.<br/>
 Downloadable here: https://1drv.ms/u/s!AoEekc0Cw3zhgbA0o3HSjFyaKJSg4Q?e=Oa6gik<br /> 
 -- coarse_model.pt<br/>
 -- fine_model.pt<br/>
