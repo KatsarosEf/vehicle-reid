@@ -4,9 +4,9 @@ Github repo for the paper "A Triplet-learnt Coarse-to-Fine Reranking for Vehicle
 
 Weights of models discussed in the paper as dictionaries.
 Downloadable here: https://1drv.ms/u/s!AoEekc0Cw3zhgbA0o3HSjFyaKJSg4Q?e=Oa6gik<br /> 
--- coarse_model.pt<br/> 
--- fine_model.pt<br/>  
--- viewpoint_classifier.pt<br/> 
+-- coarse_model.pt<br/>
+-- fine_model.pt<br/>
+-- viewpoint_classifier.pt<br/>
 -- detector.pt<br/> 
 
 -- train_coarse.py is used to train the coarse densenet121 model utilizing the triplet loss and BatchAll sampling technique. The coarse triplet model projects similar vehicle images closer together and disimilar ones further apart.
