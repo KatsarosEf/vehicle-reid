@@ -24,7 +24,7 @@ Assumes a directory where images are split into train, val and optionally test s
  /viewpoints/train/front/img_108.jpg refers to an image of the training set. It is captured from the frontal viewpoint.
  /viewpoints/val/back/img_321.jpg refers to an image of the validation set. It is captured from the backside point of view.
  
-##### train_fine.py <br /> 
+###### train_fine.py <br /> 
 It is used to train the fine model. The fine triplet model takes windshield images and - similarly to the coarse - projects similar ones closer together and disimilar ones further apart.
 Assumes a directory where windshield images are split into train and val. Each vehicle's images are then found on unique identity folders:
 
