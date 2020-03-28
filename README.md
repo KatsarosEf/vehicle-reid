@@ -4,10 +4,10 @@
 
 #### Weights of models discussed in the paper to apply the reranking and reproduce results.<br/>
 Downloadable here: https://1drv.ms/u/s!AoEekc0Cw3zhgbA0o3HSjFyaKJSg4Q?e=Oa6gik as dictionaries.<br /> 
--- coarse_model.pt (224,224,3) --> (1024) (triplet-learnt embedding) <br/>
--- fine_model.pt (62,152,3) --> (1024) (triplet-learnt embedding) <br/>
--- viewpoint_classifier.pt (1024) _-> (2) (class probabilities) <br/>
--- detector.pt (224,224,3) --> (4) (coordinates) & 2 (class probabilities) <br/> 
+-- coarse_model.pt (224,224,3) (vehicle image) ---> (1024) (triplet-learnt coarse embedding) <br/>
+-- fine_model.pt (62,152,3) (windshield image) ---> (1024) (triplet-learnt fine embedding) <br/>
+-- viewpoint_classifier.pt (1024) (coarse embedding) ---> (2) (class probabilities) <br/>
+-- detector.pt (224,224,3) (vehicle image) ---> (4) (box coordinates) & 2 (class probabilities) <br/> 
 
 #### Train the models discussed in the paper from scratch.<br/>
 ###### train_coarse.py 
