@@ -28,7 +28,10 @@ Assumes a directory where images are split into train, val and optionally test s
 It is used to train the fine model. The fine triplet model takes windshield images and - similarly to the coarse - projects similar ones closer together and disimilar ones further apart.
 Assumes a directory where windshield images are split into train and val. Each vehicle's images are then found on unique identity folders:
 
-/windshields/train/id_1223/front/img_1 refers to a frontal windshield image of the vehicle identity '1223' in the training set.
-/windshields/train/id_1223/back/img_3 belongs to the same vehicle but is a backside windshield image.
-/windshields/val/id_7536/back/img_2 refers to a frontal windshield image of the vehicle identity '7536' in the validation set.
+/windshields/train/id_1223/front/img_1.jpg refers to a frontal windshield image of the vehicle identity '1223' in the training set.
+/windshields/train/id_1223/back/img_3.jpg belongs to the same vehicle but is a backside windshield image.
+/windshields/val/id_7536/back/img_2.jpg refers to a frontal windshield image of the vehicle identity '7536' in the validation set.
+
+###### train_detector.py <br /> 
+
 
