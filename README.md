@@ -26,11 +26,11 @@ Assumes a directory where images are split into train, val and optionally test s
  
 ###### train_fine.py <br /> 
 It is used to train the fine model. The fine triplet model takes windshield images and - similarly to the coarse - projects similar ones closer together and disimilar ones further apart.
-Assumes a directory where windshield images are split into train and val. Each vehicle's images are then found on unique identity folders:
+Assumes a directory where windshield images are firstly classifier as frontal or backside-viewed w.r.t. the viewpoint classifier. Likewise, we construct the windshield classes (identities):
 
-/windshields/train/id_1223/front/img_1.jpg refers to a frontal windshield image of the vehicle identity '1223' in the training set.
-/windshields/train/id_1223/back/img_3.jpg belongs to the same vehicle but is a backside windshield image.
-/windshields/val/id_7536/back/img_2.jpg refers to a frontal windshield image of the vehicle identity '7536' in the validation set.
+/windshields/train/id_1223_front/img_1.jpg refers to a frontal windshield image of the vehicle identity '1223' in the training set.
+/windshields/train/id_1223_back/img_3.jpg belongs to the same vehicle but is a backside windshield image.
+/windshields/val/id_7536_back/img_2.jpg refers to a frontal windshield image of the vehicle identity '7536' in the validation set.
 
 ###### train_detector.py <br /> 
 It is employed to fine-tune the detector that comes pre-trained on the COCO dataset. We change the classification nodes from 81 (COCO) to 2 (windshield vs background). We use 700 annotated images (bounding boxes), 500 for training and 200 for validation. It assumes a directory of 2 subdirs ('images' and 'annotations') and 2 text files indicating which images are selected for training and which ones for validation:
