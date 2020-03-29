@@ -33,7 +33,8 @@ Assumes a directory where windshield images are split into train and val. Each v
 /windshields/val/id_7536/back/img_2.jpg refers to a frontal windshield image of the vehicle identity '7536' in the validation set.
 
 ###### train_detector.py <br /> 
-It is employed to fine-tune the detector that comes pre-trained on the COCO dataset. We change the classification nodes from 81 (COCO) to 2 (windshield vs background). We use 700 annotated images (bounding boxes), 500 for training and 200 for validation. It assumes a directory of 2 subdirs ('images' and 'annotations') and 2 text files indicating which images are selected for training and which ones for validation.
+It is employed to fine-tune the detector that comes pre-trained on the COCO dataset. We change the classification nodes from 81 (COCO) to 2 (windshield vs background). We use 700 annotated images (bounding boxes), 500 for training and 200 for validation. It assumes a directory of 2 subdirs ('images' and 'annotations') and 2 text files indicating which images are selected for training and which ones for validation:
+
 /detection/images/... contains the raw images.
 /detection/annotations/... contains the .xml annotations for each raw image. 
 /detection/train.txt contains the names of images allocated for training.
